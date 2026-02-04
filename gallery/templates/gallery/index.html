@@ -14,32 +14,30 @@
         <p>Добро пожаловать в систему хранения.</p>
         <hr>
 
-        <!-- Проверка условия -->
-        {% if models_count > 0 %}
-            <p>Сейчас в базе: <b>{{ models_count }}</b> моделей.</p>
-        {% else %}
-            <p>База пуста. Загрузите что-нибудь!</p>
-        {% endif %}
-
         <h2>Доступные ассеты:</h2>
 
         <!-- Цикл for в шаблоне Django -->
         <ul>
                 {% for asset in assets %}
                     <li>
-                        <strong>{{ asset.name }}</strong>
-                        <small>(Размер: {{ asset.file_size }})</small>
-                        <!-- Ссылка-заглушка -->
-                        <a href="#">[Скачать]</a>
+                        <strong>{{ asset.title }}</strong>
+                        <!-- asset.file.url — это ссылка на файл (/media/3d_assets/...) -->
+                        <!-- asset.file.size — размер в байтах. filter 'filesizeformat' делает его читаемым
+                        (MB/KB) -->
+                        <small>(Размер: {{ asset.file.size|filesizeformat }})</small>
+
+                        <a href="{{ asset.file.url }}" download>[Скачать файл]</a>
                     </li>
             {% empty %}
                 <!-- Этот блок сработает, если список assets пустой -->
                 <li>Нет доступных моделей.</li>
             {% endfor %}
         </ul>
-        <hr>
 
+        <hr>
         <a href="/about/">О нас</a>
+        <br>
+        <a href="/admin/">Админка</a>
     </main>
 
     <footer>

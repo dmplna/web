@@ -22,4 +22,11 @@ def about(request):
         'page_title': 'О проекте',
     }
 
-    return render(request, 'gallery/about.html', context_data)  
+    return render(request, 'gallery/about.html', context_data)
+
+def upload(request):
+    context_data = {
+        'page_title': 'Загрузка файлов',
+    }
+
+    return render(request, 'gallery/upload.html', context_data)

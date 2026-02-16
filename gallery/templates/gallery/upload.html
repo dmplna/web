@@ -1,7 +1,57 @@
-<h1>Загрузка модели</h1>
-<form>
-    <input type="text" placeholder="Название">
-    <input type="file">
-    <button>Загрузить</button>
-</form>
-<a href="/">Назад</a>
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ 'Загрузка модели' }}</title>
+
+    <link rel="stylesheet" href="{% static 'gallery/style.css' %}">
+
+</head>
+
+<body>
+    <header>
+        <h1>{{ 'Загрузка новой модели' }}</h1>
+    </header>
+
+    <!--
+        1. method="post": Чтобы отправить данные.
+        2. enctype="multipart/form-data": ОБЯЗАТЕЛЬНО для файлов!
+    -->
+    <form method="post" enctype="multipart/form-data">
+        <!-- Защита от хакеров -->
+        {% csrf_token %}
+
+        <!-- Поле для названия модели -->
+        <div class="form-group">
+            <label for="{{ form.title.id_for_label }}">{{ form.title.label }}</label>
+            {{ form.title }}  <!-- сюда добавится класс "form-control" из виджета -->
+        </div>
+
+        <!-- Поле для файла -->
+        <div class="form-group">
+            <label for="{{ form.file.id_for_label }}">{{ form.file.label }}</label>
+            {{ form.file }}  <!-- кнопка выбора файла с классом "form-control" -->
+            
+            {% if form.file.errors %}
+                <div class="error-message">
+                    {{ form.file.errors|last }}
+                </div>
+            {% endif %}
+
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+
+        <button type="submit">Загрузить в базу</button>
+    </form>
+
+    <br>
+    <a href="{% url 'home' %}">Назад в галерею</a>
+</body>
+</html>

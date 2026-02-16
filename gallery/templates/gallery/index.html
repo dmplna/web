@@ -1,12 +1,25 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>3D Storage</title>
+    <title>{{ page_title }}</title>
+
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+            "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+        }
+    }
+    </script>
+
+    <link rel="stylesheet" href="{% static 'gallery/style.css' %}">
+
 </head>
+
 <body>
     <header>
-        <!-- {{ ... }} — это переменная. Мы передадим её из Python -->
         <h1>{{ page_title }}</h1>
     </header>
     
@@ -16,34 +29,79 @@
 
         <h2>Доступные ассеты:</h2>
 
-        <!-- Цикл for в шаблоне Django -->
-        <ul>
-                {% for asset in assets %}
-                    <li>
-                        <strong>{{ asset.title }}</strong>
-                        <!-- asset.file.url — это ссылка на файл (/media/3d_assets/...) -->
-                        <!-- asset.file.size — размер в байтах. filter 'filesizeformat' делает его читаемым
-                        (MB/KB) -->
-                        <small>(Размер: {{ asset.file.size|filesizeformat }})</small>
+        <!-- Контейнер сетки -->
+        <div class="gallery-grid">
 
-                        <a href="{{ asset.file.url }}" download>[Скачать файл]</a>
-                    </li>
+            {% for asset in assets %}
+                <!-- Карточка -->
+                <div class="asset-card">
+                    <!-- 1. Превью (Верхняя часть) -->
+                    <!-- Добавляем ID и data-url.
+                    id="model-container-..." нужен, чтобы JS нашел конкретный div.
+                    data-url="..." хранит ссылку на файл, которую JS прочитает.
+                    -->
+                    <div class="card-preview" id="model-container-{{ asset.id }}" data-url="{{ asset.file.url }}">>
+                        <br>
+                        🔄 Wait...
+                    </div>
+
+                    <!-- 2. Информация (Нижняя часть) -->
+                    <div class="card-info">
+                        <h3 class="card-title">{{ asset.title }}</h3>
+
+                        <div class="card-meta">
+                            <span>📅 {{ asset.created_at|date:"d M Y" }}</span>
+                            <!-- Если есть файл, показываем размер -->
+                            {% if asset.file %}
+                                <span style="float: right;">💾 {{ asset.file.size|filesizeformat }}</span>
+                            {% endif %}
+                        </div>
+
+                        <!-- Кнопка скачивания -->
+                        {% if asset.file %}
+                            <a href="{{ asset.file.url }}" class="btn" download>Скачать.glb</a>
+                        {% else %}
+                            <span style="color: #a80000;">Файл потерян</span>
+                        {% endif %}
+                    </div>
+                </div>
             {% empty %}
-                <!-- Этот блок сработает, если список assets пустой -->
-                <li>Нет доступных моделей.</li>
+                <p>База пуста.</p>
             {% endfor %}
-        </ul>
+        </div>
 
-        <hr>
+        <br><hr><br>
+        <!-- Ссылка на загрузку теперь выглядит как кнопка -->
+        <a href="{% url 'upload' %}" class="btn" style="background-color: #D5FF40; color: black; padding: 5px 10px;">Загрузить модель</a>
+        <br><br>
         <a href="/about/">О нас</a>
         <br>
         <a href="/admin/">Админка</a>
-        <br>
-        <a href="/upload/">Загрузить модель</a>
     </main>
 
     <footer>
         <p>&copy; 2026 Web Structures Course</p>
     </footer>
+
+<!-- type="module" включает режим современных импортов -->
+<script type="module">
+    // Импортируем нашу функцию.
+    // Обратите внимание: путь к JS через static
+    import { loadModel } from "{% static 'gallery/js/viewer.js' %}";
+
+    // Находим все контейнеры карточек
+    const containers = document.querySelectorAll('.card-preview');
+    
+    // Пробегаемся по каждой
+    containers.forEach(container => {
+        const id = container.id; // Например: "model-container-5"
+        const url = container.dataset.url; // Например: "/media/3d_assets/chair.glb"
+        // Если URL есть (файл существует) - запускаем viewer
+        if (url) {
+            loadModel(id, url);
+        }
+    });
+</script>
+
 </body>
 </html>

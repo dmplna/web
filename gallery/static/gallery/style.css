@@ -32,6 +32,15 @@ button {
     cursor: pointer; 
 }
 
+button:disabled { 
+    color: ghostwhite;
+    background-color: #999;
+    font-family: monospace;
+    font-weight: bolder;
+    padding: 10px 15px;
+    cursor: pointer; 
+}
+
 /* --- СЕТКА (GRID) --- */
 .gallery-grid {
     display: grid;

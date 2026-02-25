@@ -39,11 +39,11 @@
 
         <!-- БЛОК ПРЕВЬЮ -->
         <div style="margin-bottom: 20px;">
-            <p>Авто-генерация превью:</p>
+            <h2>Авто-генерация превью:</h2>
 
             <!-- Сюда JS вставит Canvas с 3D моделью -->
-            <div id="preview-container" style="width: 300px; height: 200px; background: ghostwhite; border: 1px solid #ccc;">
-                <span style="display: block; padding: 80px 0; text-align: center; color:#999;">Выберите файл...</span>
+            <div id="preview-container" style="width: 300px; height: 200px; background: ghostwhite; border: 1px solid #ccc; display: block; margin: 0 auto;">
+                <span style="display: block; padding: 100px 0; text-align: center; color:#999;">Выберите файл...</span>
             </div>
 
             <!-- СКРЫТОЕ ПОЛЕ (Сюда JS запишет длинную строку base64) -->
@@ -52,7 +52,7 @@
 
         <!-- ПОЛЕ ДЛЯ ФАЙЛА -->
         <div class="form-group">
-            <label for="{{ form.file.id_for_label }}">{{ form.file.label }}</label>
+            <label for="{{ form.file.id_for_label }}" >{{ form.file.label }}</label>
             {{ form.file }}  <!-- кнопка выбора файла с классом "form-control" -->
             
             {% if form.file.errors %}

@@ -20,7 +20,7 @@ a {
     color: #D5FF40; 
     display: block; 
     width: fit-content; 
-    text-align: left;
+    margin: 0 auto;
 }
 
 button { 
@@ -29,16 +29,13 @@ button {
     font-family: monospace;
     font-weight: bolder;
     padding: 10px 15px;
-    cursor: pointer; 
+    cursor: pointer;
+    display: block;
+    margin: 0 auto; 
 }
 
 button:disabled { 
-    color: ghostwhite;
-    background-color: #999;
-    font-family: monospace;
-    font-weight: bolder;
-    padding: 10px 15px;
-    cursor: pointer; 
+    background-color: #999; 
 }
 
 /* --- СЕТКА (GRID) --- */
@@ -70,13 +67,61 @@ button:disabled {
 /* Место для будущего 3D-вьювера или скриншота */
 .card-preview {
     position: relative;
+    cursor: pointer;
+    background-size: cover;
+    background-position: center;
     height: 200px;
-    background: radial-gradient(circle, #ffffff,#cecece);
+    background: radial-gradient(circle, #ffffff,#ececec);
     display: flex;
     align-items: center;
     justify-content: center;
-    color: ghostwhite;
-    font-size: 3rem;
+    touch-action: auto;
+}
+
+/* Canvas для 3D модели */
+.card-preview canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    pointer-events: auto;
+    touch-action: none;
+}
+
+/* Затемнение картинки при наведении */
+.card-preview:hover::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.1);
+    pointer-events: none;
+}
+
+/* Кнопка Play */
+.play-btn {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* Точная центровка */
+
+    width: 60px;
+    height: 60px;
+    background: rgba(0, 0, 0, 0.6);
+    border-radius: 50%;
+
+    color: white;
+    font-size: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    transition: transform 0.2s, background 0.2s;
+    z-index: 5; /* Чтобы была поверх картинки */
+}
+
+/* Эффект нажатия */
+.card-preview:hover .play-btn {
+    background: #D5FF40;
+    transform: translate(-50%, -50%) scale(1.1);
 }
 
 .card-info {
@@ -123,6 +168,7 @@ button:disabled {
     justify-content: center;
     z-index: 10;
     transition: opacity 0.3s; /* Плавное исчезновение */
+    pointer-events: none; /* Не перехватывает события мыши */
 }
 
 /* Полоска прогресса (фон) */
@@ -150,7 +196,8 @@ button:disabled {
     padding: 20px;
 }
 
-.form-group { margin-bottom: 1rem; color: ghostwhite; }
-.form-control { font-family: monospace; }
-.error-message {color: #d30000; margin-top: 5px;}
-.alert-success { color: darkseagreen; margin-top: 5px; }
+.form-group {margin-bottom: 1rem; color: ghostwhite; text-align: center;}
+.form-control {font-family: monospace; text-align: center;}
+.error-message {color: #d30000; margin-top: 5px; text-align: center;}
+.alert-success { color: darkseagreen; margin-top: 5px; text-align: center;}
+

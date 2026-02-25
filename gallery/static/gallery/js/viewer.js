@@ -40,6 +40,9 @@ export function loadModel(containerId, modelUrl) {
     // Вставляем "холст" (canvas) внутрь нашего div
     container.innerHTML = ''; // Очищаем текст "Wait..."
     container.appendChild(renderer.domElement);
+    
+    // Устанавливаем градиент фона на сам canvas
+    renderer.domElement.style.background = 'radial-gradient(circle, #ffffff, #ececec)';
 
     // --- Г. УПРАВЛЕНИЕ ---
     const controls = new OrbitControls(camera, renderer.domElement);
@@ -48,10 +51,13 @@ export function loadModel(containerId, modelUrl) {
     controls.enableDamping = true;
     controls.dampingFactor = 0.05;
 
+    // Включаем зум
+    controls.enableZoom = true;
+
     // Ограничиваем зум (чтобы не улететь сквозь модель)
-    controls.minDistance = 0.5;
-    controls.maxDistance = 20;
-    controls.zoomSpeed = 0.001;
+    controls.minDistance = 1.5;
+    controls.maxDistance = 50;
+    controls.zoomSpeed = 2.0;
 
     // --- Д. СВЕТ ---
     const pmremGenerator = new THREE.PMREMGenerator(renderer);
@@ -121,11 +127,6 @@ export function loadModel(containerId, modelUrl) {
         // ОБЯЗАТЕЛЬНО: Обновляем контроллер в каждом кадре
         controls.update();
 
-        // Авто-вращение можно убрать или оставить по желанию.
-        // Если оставить, оно будет конфликтовать с мышкой.
-        // Давайте пока закомментируем авто-вращение:
-        // if (loadedModel) loadedModel.rotation.y += 0.005;
-
         renderer.render(scene, camera);
     }
 
@@ -155,16 +156,25 @@ function fitCameraToObject(camera, object, controls) {
     // 3. Самая длинная сторона модели (чтобы точно влезла)
     const maxDim = Math.max(size.x, size.y, size.z);
 
+    // Масштабируем модель, чтобы она имела одинаковый размер с другими
+    const targetSize = 20; // Целевой размер для всех моделей
+    const scale = targetSize / maxDim;
+    object.scale.multiplyScalar(scale);
+    
+    // Пересчитываем Bounding Box после масштабирования
+    const boundingBoxScaled = new THREE.Box3().setFromObject(object);
+    const centerScaled = boundingBoxScaled.getCenter(new THREE.Vector3());
+    const sizeScaled = boundingBoxScaled.getSize(new THREE.Vector3());
+    const maxDimScaled = Math.max(sizeScaled.x, sizeScaled.y, sizeScaled.z);
+
     // 4. Смещаем саму модель так, чтобы её центр стал в 0,0,0
-    // Вместо того чтобы двигать камеру за моделью, проще притянуть модель к центру мира
-    object.position.x = -center.x;
-    object.position.y = -center.y; // Теперь модель стоит на "полу" центра
-    object.position.z = -center.z;
+    object.position.x = -centerScaled.x;
+    object.position.y = -centerScaled.y;
+    object.position.z = -centerScaled.z;
 
     // 5. Отодвигаем камеру назад
-    // Немного тригонометрии: вычисляем дистанцию в зависимости от угла обзора (FOV)
     const fov = camera.fov * (Math.PI / 180);
-    let cameraZ = Math.abs(maxDim / 2 / Math.tan(fov / 2)) * 1.5;
+    let cameraZ = Math.abs(maxDimScaled / 2 / Math.tan(fov / 2)) * 1.5;
 
     // Устанавливаем камеру
     camera.position.set(cameraZ, cameraZ * 0.5, cameraZ); // Чуть выше центра

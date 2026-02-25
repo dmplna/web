@@ -21,12 +21,42 @@
 <body>
     <header>
         <h1>{{ page_title }}</h1>
-    </header>
-    
-    <main>
         <p>Добро пожаловать в систему хранения.</p>
         <hr>
+    </header>
+    
+    <!-- Блок поиска и фильтров -->
+    <div class="toolbar">
+        <form action="{% url 'home' %}" method="get" style="display: flex; width: 100%; gap: 10px; align-items: center;">
+        
+            <!-- 1. Поле поиска -->
+            <!-- value="{{ request.GET.q }}" - это Sticky UI.
+            Мы оставляем текст в поле после перезагрузки страницы -->
+            <input type="text" name="q" class="search-input"
+                placeholder="Найти 3D модель..."
+                value="{{ request.GET.q|default:'' }}">
+            
+            <!-- 2. Сортировка -->
+            <!-- onchange="this.form.submit()" заставляет форму отправиться сразу при выборе из списка -->
+            <select name="ordering" class="sort-select" onchange="this.form.submit()">
+                <option value="new" {% if request.GET.ordering == 'new' %}selected{% endif%}>Сначала новые</option>
+                <option value="old" {% if request.GET.ordering == 'old' %}selected{% endif%}>Сначала старые</option>
+                <option value="name" {% if request.GET.ordering == 'name' %}selected{% endif%}>По имени (А-Я)</option>
+                <option value="today" {% if request.GET.ordering == 'today' %}selected{% endif%}>Сегодня</option>
+                <option value="week" {% if request.GET.ordering == 'week' %}selected{% endif%}>За неделю</option>
+            </select>
+            
+            <!-- 3. Кнопка -->
+            <button type="submit" class="search-btn">Найти</button>
+            
+            <!-- 4. Кнопка сброса (если поиск активен) -->
+            {% if request.GET.q or request.GET.ordering %}
+                <a href="{% url 'home' %}" class="reset-link">✖ Сбросить</a>
+            {% endif %}
+        </form>
+    </div>
 
+    <main>
         <h2>Доступные ассеты:</h2>
 
         <!-- Контейнер сетки -->
@@ -78,13 +108,26 @@
                     </div>
                 </div>
             {% empty %}
-                <p>База пуста.</p>
+                <div style="grid-column: 1 / -1; text-align: center; padding: 40px;">
+
+                    {% if request.GET.q %}
+                        <!-- Если был поиск -->
+                        <p style="font-size: 5rem;">😞</p>
+                        <h3>По запросу "<b>{{ request.GET.q }}</b>" ничего не найдено</h3>
+                        <p>Попробуйте изменить запрос или <a href="{% url 'home'%}">сбросить фильтры</a></p>
+                    {% else %}
+                        <!-- Если база реально пуста -->
+                        <p style="font-size: 5rem;">👀</p>
+                        <h3>База пуста</h3>
+                        <p>Загрузите первую модель!</p>
+                    {% endif %}
+                </div>
             {% endfor %}
         </div>
 
         <br><hr><br>
         <!-- Ссылка на загрузку теперь выглядит как кнопка -->
-        <a href="{% url 'upload' %}" class="btn" style="background-color: #D5FF40; color: black; padding: 5px 10px; display: block; margin: 0 auto;">Загрузить модель</a>
+        <a href="{% url 'upload' %}" class="btn" style="background-color: #D5FF40; color: #1A1D29; padding: 5px 10px; display: block; margin: 0 auto;">Загрузить модель</a>
         <br>
         <a href="/about/">О нас</a>
         <br>

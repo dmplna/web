@@ -5,15 +5,37 @@ from .models import Asset # Импортируем модель, чтобы сп
 from .forms import AssetForm # Импортируем нашу новую форму
 import base64
 from django.core.files.base import ContentFile # Обертка для сохранения файлов
+from django.db.models import Q # Импортируем Q-object для сложного поиска
+from django.utils import timezone
 
 # request — это "письмо" от браузера с данными о пользователе
 def home(request):
-    # ORM Запрос: "Дай мне все объекты Asset из базы"
-    # all() возвращает хаос.
-    # order_by('-created_at') сортирует по полю created_at.
-    # Минус (-) означает "по убыванию" (DESC).
-    assets = Asset.objects.all().order_by('-created_at')
+    # 1. Получаем параметры из URL (GET-запроса)
+    # Если параметра нет, вернет None (или пустую строку, если мы так настроили)
+    search_query = request.GET.get('q', '')
+    ordering = request.GET.get('ordering', 'new') # По умолчанию 'new'
 
+    # 2. Базовый запрос: Берем ВСЕ
+    assets = Asset.objects.all()
+
+    # 3. Применяем поиск (если пользователь что-то ввел)
+    if search_query:
+        assets = assets.filter(title__icontains=search_query)
+
+    # 4. Применяем сортировку
+    if ordering == 'old':
+        assets = assets.order_by('created_at') # От старых к новым
+    elif ordering == 'name':
+        assets = assets.order_by('title') # По алфавиту
+    elif ordering == 'today':
+        assets = assets.filter(created_at__gte=timezone.now() - timezone.timedelta(days=1)) # За последние 24 часа
+    elif ordering == 'week':
+        assets = assets.filter(created_at__gte=timezone.now() - timezone.timedelta(days=7)) # За последнюю неделю
+    else:
+        # По умолчанию (new) - свежие сверху
+        assets = assets.order_by('-created_at')
+
+    # 5. Отдаем результат
     context_data = {
         'page_title': 'Главная галерея',
         'assets': assets, # Передаем реальный список

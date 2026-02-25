@@ -38,6 +38,59 @@ button:disabled {
     background-color: #999; 
 }
 
+/* --- ПАНЕЛЬ ИНСТРУМЕНТОВ --- */
+.toolbar {
+    background: #3b4053;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    margin: 0 auto 30px auto;
+    max-width: 900px;
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    flex-wrap: wrap; /* Чтобы на мобильном переносилось */
+}
+
+.search-input {
+    flex-grow: 1; /* Занимает всё свободное место */
+    padding: 10px 15px;
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-family: monospace;
+}
+
+.sort-select {
+    padding: 10px;
+    border-radius: 6px;
+    background: white;
+    color: #1A1D29;
+    cursor: pointer;
+    font-family: monospace;
+}
+
+.search-btn {
+    padding: 10px 25px;
+    background-color: #D5FF40;
+    color: #1A1D29;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-family: monospace;
+}
+
+.search-btn:hover {
+    background-color: #D5FF40;
+}
+
+.reset-link {
+    color: #dd3c3c;
+    text-decoration: none;
+    font-size: 0.9rem;
+}
+
 /* --- СЕТКА (GRID) --- */
 .gallery-grid {
     display: grid;

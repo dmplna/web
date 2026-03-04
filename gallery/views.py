@@ -7,6 +7,7 @@ import base64
 from django.core.files.base import ContentFile # Обертка для сохранения файлов
 from django.db.models import Q # Импортируем Q-object для сложного поиска
 from django.utils import timezone
+from django.core.paginator import Paginator
 
 # request — это "письмо" от браузера с данными о пользователе
 def home(request):
@@ -35,10 +36,20 @@ def home(request):
         # По умолчанию (new) - свежие сверху
         assets = assets.order_by('-created_at')
 
-    # 5. Отдаем результат
+    # --- ПАГИНАЦИЯ (Новый код) ---
+    # Режем список по 4 штуки на страницу (для теста, чтобы быстрее увидеть кнопки)
+    paginator = Paginator(assets, 3)
+
+    # Получаем номер страницы из URL (например, ?page=2)
+    page_number = request.GET.get('page')
+
+    # Получаем конкретный кусочек данных (объект Page)
+    page_obj = paginator.get_page(page_number)
+
+    # 6. Отдаем результат
     context_data = {
         'page_title': 'Главная галерея',
-        'assets': assets, # Передаем реальный список
+        'page_obj': page_obj, 
     }
 
     return render(request, 'gallery/index.html', context_data)
@@ -80,8 +91,8 @@ def upload(request):
 
             # 3. Финальное сохранение в БД
             new_asset.save()
-            messages.success(request, 'Файл успешно загружен!') # Сообщение об успешной загрузке
-            return redirect('upload')
+            messages.success(request, f'Модель "{new_asset.title}" успешно загружена!') # Сообщение об успешной загрузке
+            return redirect('home')
     else:
         # Сценарий: Пользователь просто зашел на страницу (GET)
         form = AssetForm() # Создаем пустую форму

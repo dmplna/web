@@ -11,6 +11,10 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
 from pathlib import Path
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -19,13 +23,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-(jn275ce&z8h4q6$#8+y(!)#+bpiv8br=yeiu^*1(ppc3p5(-y'
+# Если ключа нет в .env, возьмем запасной (но лучше, чтобы был)
+SECRET_KEY = os.getenv('SECRET_KEY', 'unsafe-secret-key')
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# os.getenv возвращает строку. Превращаем строку 'True' в булево True.
+DEBUG = os.getenv('DEBUG') == 'True'
 
-ALLOWED_HOSTS = []
+# Разрешенные хосты. В продакшене здесь будет имя сайта.
+# Звездочка * разрешает всем (пока оставим так для простоты)
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -42,6 +48,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -115,11 +122,17 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
+# URL, по которому браузер ищет статику
 STATIC_URL = 'static/'
 
-import os
+# Папки, где мы (разработчики) храним статику
+STATICFILES_DIRS = [BASE_DIR / 'gallery' / 'static',]
 
-# ... (конец файла settings.py)
+# Папка, куда collectstatic соберет ВСЕ файлы для сервера (создастся сама)
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+# Включаем сжатие и кэширование статики для WhiteNoise
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Базовый URL для доступа к файлам в браузере
 MEDIA_URL = '/media/'
@@ -127,3 +140,5 @@ MEDIA_URL = '/media/'
 # Физический путь на диске, где будет создана папка media
 # BASE_DIR — это папка, где лежит manage.py
 MEDIA_ROOT = BASE_DIR / 'media'
+
+# dotenv уже загружен в начале файла

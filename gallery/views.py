@@ -38,7 +38,7 @@ def home(request):
 
     # --- ПАГИНАЦИЯ (Новый код) ---
     # Режем список по 4 штуки на страницу (для теста, чтобы быстрее увидеть кнопки)
-    paginator = Paginator(assets, 3)
+    paginator = Paginator(assets, 6)
 
     # Получаем номер страницы из URL (например, ?page=2)
     page_number = request.GET.get('page')

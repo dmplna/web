@@ -31,7 +31,7 @@ DEBUG = os.getenv('DEBUG') == 'False'
 
 # Разрешенные хосты. В продакшене здесь будет имя сайта.
 # Звездочка * разрешает всем (пока оставим так для простоты)
-ALLOWED_HOSTS = ['https://dmplna.pythonanywhere.com/']
+ALLOWED_HOSTS = ['dmplna.pythonanywhere.com']
 
 
 # Application definition
